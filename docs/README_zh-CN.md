@@ -1,10 +1,9 @@
 # Clawd Mochi ESP32-S3 固件说明
 
-这个目录是整理后的 GitHub 发布版本。
-
 ## 功能
 
 - 适配 ESP32-S3 + ST7789 1.54 寸 240x240 屏幕
+- 提供待机、工作、等待、完成等表情动画
 - 支持 Claude Code 通过 USB 串口联动
 - 支持 Claude Code 通过局域网 HTTP 联动
 - 提供中文 WiFi 配网页
@@ -19,6 +18,12 @@
 - RST -> GPIO 18
 - BL -> GPIO 13
 
+目标屏幕：
+
+- ST7789
+- 1.54 寸
+- 240x240 分辨率
+
 ## 烧录参数
 
 ```text
@@ -32,6 +37,24 @@ esp32:esp32:esp32s3:CDCOnBoot=cdc,UploadSpeed=921600,FlashSize=16M,PSRAM=opi
 - 热点名：`ClaWD-Mochi`
 - 密码：`clawd1234`
 - 页面：`http://192.168.4.1/wifi`
+
+连接成功后，设备会离开配网页面并直接回到待机表情。
+
+## Claude Code 联动
+
+支持的串口命令：
+
+- `CC:busy`
+- `CC:waiting`
+- `CC:idle`
+- `CC:done`
+- `CC:ip`
+
+支持的 HTTP 接口：
+
+- `/cc?state=busy|waiting|idle|done`
+- `/state`
+- `/wifi`
 
 ## 文件说明
 
