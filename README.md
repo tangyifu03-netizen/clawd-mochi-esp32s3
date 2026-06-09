@@ -1,59 +1,95 @@
-# Clawd Mochi ESP32-S3 Firmware
+# Clawd Mochi for ESP32-S3
 
-ESP32-S3 firmware for a 1.54 inch ST7789 240x240 display board used as a Clawd Mochi status device.
+Firmware for an ESP32-S3 desktop status companion with a 1.54 inch ST7789 240x240 display.
 
-This build supports:
+This project is tailored for a compact "Clawd Mochi" style device that can:
 
-- ESP32-S3 + ST7789 1.54 inch 240x240 display
-- USB serial control from Claude Code
-- LAN HTTP control from Claude Code hooks
-- Chinese WiFi setup page at `http://192.168.4.1/wifi`
-- Automatic return to idle face after WiFi connects
+- show animated idle / busy / waiting / done faces
+- receive Claude Code status updates over USB serial
+- receive Claude Code status updates over LAN HTTP
+- provide a Chinese WiFi setup page for standalone use
+- return to the idle face automatically after WiFi connects
+
+## Features
+
+- ESP32-S3 + ST7789 240x240 display support
+- WiFi AP fallback for easy network setup
+- Claude Code serial protocol support
+- Claude Code HTTP hook support
+- local web endpoints for state control and diagnostics
+- display-first UX with expressive status faces instead of text-only feedback
 
 ## Hardware
 
-Display wiring used by this firmware:
+This firmware is configured for the following display wiring:
 
-- MOSI / SDA -> GPIO 10
-- SCK / SCL -> GPIO 9
-- DC -> GPIO 8
-- CS -> GPIO 14
-- RST -> GPIO 18
-- BL -> GPIO 13
+| Signal | GPIO |
+| --- | --- |
+| MOSI / SDA | 10 |
+| SCK / SCL | 9 |
+| DC | 8 |
+| CS | 14 |
+| RST | 18 |
+| BL | 13 |
 
-## Build / Upload
+Target display:
 
-Arduino FQBN:
+- ST7789
+- 1.54 inch
+- 240x240 resolution
+
+## Project Files
+
+- `clawd_mochi_esp32s3.ino`: primary sketch file
+- `clawd_mochi_esp32s3_wifi_idle_20260609.ino`: dated snapshot of the same firmware version
+- [docs/README_zh-CN.md](./docs/README_zh-CN.md): Chinese notes and quick reference
+
+## Build and Upload
+
+Recommended Arduino FQBN:
 
 ```text
 esp32:esp32:esp32s3:CDCOnBoot=cdc,UploadSpeed=921600,FlashSize=16M,PSRAM=opi
 ```
 
-Main sketch files in this folder:
-
-- `clawd_mochi_esp32s3.ino`
-- `clawd_mochi_esp32s3_wifi_idle_20260609.ino`
-
 ## WiFi Setup
 
-When WiFi is not configured or connection fails:
+If saved WiFi is missing or connection fails, the device starts a setup hotspot:
 
-- device AP: `ClaWD-Mochi`
-- password: `clawd1234`
-- setup page: `http://192.168.4.1/wifi`
+- SSID: `ClaWD-Mochi`
+- Password: `clawd1234`
+- Setup page: `http://192.168.4.1/wifi`
 
-After successful WiFi connection, the screen leaves setup info and returns directly to the idle face.
+Once WiFi connects successfully, the device leaves the setup screen and returns directly to the idle face.
 
 ## Claude Code Integration
 
-Supported state commands:
+Supported serial commands:
 
-- serial: `CC:busy`, `CC:waiting`, `CC:idle`, `CC:done`, `CC:ip`
-- HTTP: `/cc?state=busy|waiting|idle|done`
-- state query: `/state`
-- wifi page: `/wifi`
+- `CC:busy`
+- `CC:waiting`
+- `CC:idle`
+- `CC:done`
+- `CC:ip`
+
+Supported HTTP endpoints:
+
+- `/cc?state=busy|waiting|idle|done`
+- `/state`
+- `/wifi`
+
+## Status Behavior
+
+- `idle`: calm face with subtle blinking
+- `busy`: focused animation
+- `waiting`: request / permission face
+- `done`: completion animation, then return to idle
 
 ## Notes
 
-- This folder is the organized GitHub upload version created on 2026-06-09.
-- The older sibling folder `clawd_mochi_esp32s3` was kept unchanged.
+- This repository version was prepared on 2026-06-09 as a cleaned project snapshot.
+- The older sibling local folder `clawd_mochi_esp32s3` was intentionally kept unchanged.
+
+## License
+
+MIT License. See [LICENSE](./LICENSE).
