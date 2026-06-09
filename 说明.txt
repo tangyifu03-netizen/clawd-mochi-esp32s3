@@ -1,0 +1,13 @@
+Clawd Mochi ESP32-S3 固件 - 2026-06-09
+
+这个版本包含：
+- ESP32-S3 + ST7789 1.54 240x240 屏幕适配
+- Claude Code USB 串口联动
+- Claude Code 局域网 HTTP 联动
+- 中文 WiFi 配网页：http://192.168.4.1/wifi
+- 配网成功后自动进入待机表情，不再停留在配网信息页
+
+烧录 FQBN：
+esp32:esp32:esp32s3:CDCOnBoot=cdc,UploadSpeed=921600,FlashSize=16M,PSRAM=opi
+
+注意：旁边旧目录 clawd_mochi_esp32s3 没有被替换。
