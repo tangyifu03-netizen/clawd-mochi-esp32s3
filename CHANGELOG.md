@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.2.2 - 2026-06-10
+
+- changed the pet body color from black to the Clawd orange accent
+- changed the animation background to pure black
+- changed Clawd eyes and facial marks to black
+- kept status props such as bubbles, sparkles, and keyboard highlights readable on the black background
+
 ## v0.2.1 - 2026-06-10
 
 - changed the firmware animation layer from face-only drawings to full-body Clawd-style procedural drawings

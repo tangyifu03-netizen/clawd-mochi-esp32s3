@@ -24,7 +24,7 @@ This project is built for a compact Clawd Mochi style device that can:
 
 ## Current Version
 
-`v0.2.1`
+`v0.2.2`
 
 ## License
 
