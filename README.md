@@ -16,15 +16,15 @@ This project is built for a compact Clawd Mochi style device that can:
 
 ## Repository Layout
 
-- `clawd_mochi_esp32s3.ino`: primary sketch file
-- `clawd_mochi_esp32s3_wifi_idle_20260609.ino`: dated firmware snapshot
+- `firmware/clawd_mochi_esp32s3/clawd_mochi_esp32s3.ino`: primary Arduino sketch
+- `archive/clawd_mochi_esp32s3_v0.1.0.ino`: archived v0.1.0 firmware snapshot
 - [docs/README_en.md](./docs/README_en.md): full English documentation
 - [docs/README_zh-CN.md](./docs/README_zh-CN.md): full Chinese documentation
 - [CHANGELOG.md](./CHANGELOG.md): project history
 
 ## Current Version
 
-`v0.1.0`
+`v0.2.0`
 
 ## License
 

@@ -4,6 +4,7 @@
 
 - ESP32-S3 + ST7789 240x240 display support
 - expressive animated face states
+- Clawd on Desk inspired state mapping, redrawn procedurally for the small display
 - WiFi AP fallback for easy setup
 - Claude Code serial protocol support
 - Claude Code HTTP hook support
@@ -65,11 +66,14 @@ Supported HTTP endpoints:
 ## Status Behavior
 
 - `idle`: calm face with subtle blinking
-- `busy`: focused animation
-- `waiting`: permission / request face
-- `done`: completion animation, then return to idle
+- `idle`: look / yawn / doze rotation
+- `busy`: thinking / typing / ultrathink style animation
+- `waiting`: notification / permission request face
+- `done`: happy completion animation, then return to idle
+- `error`: dizzy / error face
 
 ## Notes
 
-- `clawd_mochi_esp32s3.ino` should be treated as the primary entry sketch.
-- `clawd_mochi_esp32s3_wifi_idle_20260609.ino` is kept as a dated snapshot for archival clarity.
+- `firmware/clawd_mochi_esp32s3/clawd_mochi_esp32s3.ino` should be treated as the primary entry sketch.
+- `archive/clawd_mochi_esp32s3_v0.1.0.ino` is kept as the previous v0.1.0 snapshot for archival clarity.
+- The firmware does not embed the desktop app SVG assets; it uses lightweight procedural drawings inspired by the state model.

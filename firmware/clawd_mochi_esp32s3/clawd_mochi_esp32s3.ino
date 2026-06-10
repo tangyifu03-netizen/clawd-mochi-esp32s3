@@ -94,8 +94,11 @@ String  serialLine  = "";
 #define CC_IDLE    0
 #define CC_BUSY    1
 #define CC_WAITING 2
+#define CC_ERROR   3
 uint8_t claudeVisualState = CC_IDLE;
 uint8_t busyFrame = 0;
+uint8_t idleFrame = 0;
+const char* clawdMood = "idle-look";
 unsigned long lastClaudeAnimMs = 0;
 unsigned long lastIdleBlinkMs = 0;
 
@@ -321,6 +324,109 @@ void drawCodeView() {
   tft.fillRect((DISP_W - 96) / 2, DISP_H / 2 + 52, 96, 3, C_ORANGE);
 }
 
+void drawClawdFrame(const char* mood, int8_t eyeOffset, int8_t lid,
+                    bool mouth, bool spark, bool bubble) {
+  clawdMood = mood;
+  termMode = false;
+  tft.fillScreen(animBgColor);
+
+  const int16_t lx = 54 + eyeOffset;
+  const int16_t rx = 148 + eyeOffset;
+  const int16_t ey = 78 + lid;
+  const int16_t eh = max(8, 62 - abs(lid) * 3);
+
+  tft.fillRoundRect(lx, ey, 34, eh, 4, C_BLACK);
+  tft.fillRoundRect(rx, ey, 34, eh, 4, C_BLACK);
+
+  if (lid > 8) {
+    tft.fillRect(lx, ey + eh / 2, 34, 5, animBgColor);
+    tft.fillRect(rx, ey + eh / 2, 34, 5, animBgColor);
+  }
+
+  tft.fillCircle(lx + 23, ey + 16, 3, C_WHITE);
+  tft.fillCircle(rx + 23, ey + 16, 3, C_WHITE);
+
+  if (mouth) {
+    for (int deg = 30; deg <= 150; deg += 8) {
+      float a = deg * 0.0174533f;
+      tft.fillCircle(120 + cos(a) * 33, 150 + sin(a) * 18, 2, C_BLACK);
+    }
+  } else {
+    tft.fillRect(104, 158, 32, 5, C_BLACK);
+  }
+
+  if (spark) {
+    tft.drawFastHLine(204, 54, 18, C_WHITE);
+    tft.drawFastVLine(213, 45, 18, C_WHITE);
+    tft.fillCircle(213, 54, 3, C_WHITE);
+  }
+
+  if (bubble) {
+    tft.drawCircle(190, 54, 9, C_WHITE);
+    tft.drawCircle(207, 42, 5, C_WHITE);
+    tft.fillCircle(218, 34, 2, C_WHITE);
+  }
+}
+
+void drawClawdDoze(uint8_t frame) {
+  clawdMood = "idle-doze";
+  termMode = false;
+  tft.fillScreen(animBgColor);
+  tft.fillRect(58, 112, 34, 6, C_BLACK);
+  tft.fillRect(150, 112, 34, 6, C_BLACK);
+  tft.fillRect(104, 156, 32, 5, C_BLACK);
+  tft.setTextColor(C_WHITE); tft.setTextSize(2);
+  tft.setCursor(184 + (frame % 2) * 6, 54); tft.print("z");
+  tft.setCursor(202, 36); tft.print("Z");
+}
+
+void drawClawdYawn(uint8_t frame) {
+  clawdMood = "idle-yawn";
+  termMode = false;
+  tft.fillScreen(animBgColor);
+  tft.fillRect(58, 108, 34, 7, C_BLACK);
+  tft.fillRect(150, 108, 34, 7, C_BLACK);
+  tft.drawCircle(120, 154, 15 + frame % 2, C_BLACK);
+  tft.drawCircle(120, 154, 16 + frame % 2, C_BLACK);
+}
+
+void drawClawdThinking(uint8_t frame) {
+  currentView = VIEW_CODE;
+  drawClawdFrame(frame % 2 ? "working-thinking" : "working-ultrathink",
+                 frame % 2 ? 2 : -2, 0, false, frame % 2, false);
+  tft.fillRect(72, 66, 42, 9, C_BLACK);
+  tft.fillRect(140, 66, 42, 9, C_BLACK);
+}
+
+void drawClawdTyping(uint8_t frame) {
+  currentView = VIEW_CODE;
+  drawClawdFrame("working-typing", frame % 2 ? 3 : -3, 0, false, false, false);
+  const int16_t y = 184;
+  for (uint8_t i = 0; i < 3; i++) {
+    tft.fillCircle(100 + i * 20, y + ((frame + i) % 2) * 5, 4, C_BLACK);
+  }
+}
+
+void drawClawdNotification() {
+  currentView = VIEW_EYES_SQUISH;
+  drawClawdFrame("notification", 0, -2, false, true, false);
+  tft.drawRoundRect(86, 176, 68, 24, 5, C_BLACK);
+  tft.fillTriangle(114, 199, 126, 199, 120, 208, C_BLACK);
+}
+
+void drawClawdError() {
+  currentView = VIEW_EYES_SQUISH;
+  clawdMood = "error-dizzy";
+  termMode = false;
+  tft.fillScreen(animBgColor);
+  tft.drawLine(56, 86, 90, 120, C_BLACK);
+  tft.drawLine(90, 86, 56, 120, C_BLACK);
+  tft.drawLine(150, 86, 184, 120, C_BLACK);
+  tft.drawLine(184, 86, 150, 120, C_BLACK);
+  tft.drawCircle(120, 160, 12, C_BLACK);
+  tft.drawCircle(120, 160, 13, C_BLACK);
+}
+
 void drawNetworkInfo() {
   currentView = VIEW_INFO;
   termMode = false;
@@ -360,26 +466,22 @@ void drawNetworkInfo() {
 
 void drawIdleFace() {
   currentView = VIEW_EYES_NORMAL;
-  drawNormalEyes();
+  idleFrame = (idleFrame + 1) % 6;
+  if (idleFrame == 2) {
+    drawClawdYawn(0);
+  } else if (idleFrame == 5) {
+    drawClawdDoze(0);
+  } else {
+    drawClawdFrame("idle-look", idleFrame % 3 - 1, 0, false, false, idleFrame == 4);
+  }
 }
 
 void drawBusyFaceFrame(uint8_t frame) {
-  currentView = VIEW_CODE;
-  termMode = false;
-  tft.fillScreen(animBgColor);
-
-  const int16_t pulse = frame % 2;
-  const int16_t glint = pulse ? 5 : 0;
-  const int16_t lx = 58 + pulse;
-  const int16_t rx = 148 - pulse;
-  const int16_t y = 84;
-  tft.fillRoundRect(lx, y, 34, 74, 3, C_BLACK);
-  tft.fillRoundRect(rx, y, 34, 74, 3, C_BLACK);
-  tft.fillTriangle(lx - 10, y - 12, lx + 38, y + 2, lx + 38, y + 16, C_BLACK);
-  tft.fillTriangle(rx + 44, y - 12, rx - 4, y + 2, rx - 4, y + 16, C_BLACK);
-
-  tft.fillCircle(78 + glint, 98, 3, C_WHITE);
-  tft.fillCircle(164 - glint, 98, 3, C_WHITE);
+  if (frame % 3 == 1) {
+    drawClawdTyping(frame);
+  } else {
+    drawClawdThinking(frame);
+  }
 }
 
 void drawBusyFace() {
@@ -387,36 +489,17 @@ void drawBusyFace() {
 }
 
 void drawWaitingFace() {
-  currentView = VIEW_EYES_SQUISH;
-  termMode = false;
-  tft.fillScreen(animBgColor);
-  tft.fillRoundRect(56, 84, 34, 66, 4, C_BLACK);
-  tft.fillRoundRect(150, 84, 34, 66, 4, C_BLACK);
-  tft.fillTriangle(48, 74, 94, 84, 92, 96, C_BLACK);
-  tft.fillTriangle(192, 74, 146, 84, 148, 96, C_BLACK);
-  tft.fillRect(114, 82, 12, 62, C_BLACK);
-  tft.fillCircle(120, 164, 7, C_BLACK);
+  drawClawdNotification();
 }
 
 void drawDoneFace() {
   currentView = VIEW_EYES_SQUISH;
-  termMode = false;
-  tft.fillScreen(animBgColor);
-  drawChevron(82, 104, 28, 28, 8, true, C_BLACK);
-  drawChevron(158, 104, 28, 28, 8, false, C_BLACK);
-  for (int deg = 30; deg <= 150; deg += 4) {
-    float a = deg * 0.0174533f;
-    int16_t x = 120 + cos(a) * 46;
-    int16_t y = 144 + sin(a) * 28;
-    tft.fillCircle(x, y, 2, C_BLACK);
-  }
+  drawClawdFrame("happy", 0, -4, true, true, false);
 }
 
 void animateDoneFace() {
-  drawSquishEyes(false);
-  delay(260);
-  drawSquishEyes(true);
-  delay(140);
+  drawClawdFrame("happy", 0, 12, true, false, false);
+  delay(220);
   drawDoneFace();
   delay(900);
 }
@@ -427,16 +510,20 @@ void applyClaudeState(const String& state) {
   s.toLowerCase();
 
   termMode = false;
-  if (s == "busy" || s == "working" || s == "thinking") {
+  if (s == "busy" || s == "working" || s == "thinking" || s == "typing" || s == "ultrathink") {
     claudeVisualState = CC_BUSY;
     busyFrame = 0;
     lastClaudeAnimMs = millis();
     drawBusyFace();
     Serial.println("CC:ok:busy");
-  } else if (s == "waiting" || s == "confirm" || s == "confirming") {
+  } else if (s == "waiting" || s == "confirm" || s == "confirming" || s == "permission" || s == "notify") {
     claudeVisualState = CC_WAITING;
     drawWaitingFace();
     Serial.println("CC:ok:waiting");
+  } else if (s == "error" || s == "failed" || s == "dizzy") {
+    claudeVisualState = CC_ERROR;
+    drawClawdError();
+    Serial.println("CC:ok:error");
   } else if (s == "done" || s == "stop") {
     animateDoneFace();
     claudeVisualState = CC_IDLE;
@@ -1264,6 +1351,7 @@ void routeState() {
   j += ",\"speed\":";  j += animSpeed;
   j += ",\"sta\":";    j += staConnected ? "true" : "false";
   j += ",\"ip\":\"";   j += staConnected ? WiFi.localIP().toString() : "";
+  j += "\",\"mood\":\""; j += clawdMood;
   j += "\"";
   j += "}";
   server.send(200, "application/json", j);
@@ -1364,15 +1452,20 @@ void tickClaudeAnimations() {
   const unsigned long now = millis();
   if (termMode || currentView == VIEW_DRAW) return;
 
-  if (claudeVisualState == CC_BUSY && now - lastClaudeAnimMs > 700) {
-    busyFrame = (busyFrame + 1) % 4;
+  if (claudeVisualState == CC_BUSY && now - lastClaudeAnimMs > 900) {
+    busyFrame = (busyFrame + 1) % 6;
     drawBusyFaceFrame(busyFrame);
     lastClaudeAnimMs = now;
   } else if (claudeVisualState == CC_IDLE && currentView == VIEW_EYES_NORMAL &&
-             now - lastIdleBlinkMs > 4200) {
-    drawNormalEyes(0, true);
-    delay(80);
-    drawNormalEyes(0, false);
+             now - lastIdleBlinkMs > 5200) {
+    if (idleFrame % 4 == 0) {
+      drawClawdDoze(idleFrame);
+    } else if (idleFrame % 3 == 0) {
+      drawClawdYawn(idleFrame);
+    } else {
+      drawClawdFrame("idle-look", idleFrame % 3 - 1, 0, false, false, idleFrame % 5 == 0);
+    }
+    idleFrame = (idleFrame + 1) % 12;
     lastIdleBlinkMs = now;
   }
 }
