@@ -4,7 +4,7 @@
 
 - ESP32-S3 + ST7789 240x240 display support
 - expressive animated face states
-- Clawd on Desk inspired state mapping, redrawn procedurally for the small display
+- Clawd on Desk inspired full-body state mapping, redrawn procedurally for the small display
 - WiFi AP fallback for easy setup
 - Claude Code serial protocol support
 - Claude Code HTTP hook support
@@ -76,4 +76,4 @@ Supported HTTP endpoints:
 
 - `firmware/clawd_mochi_esp32s3/clawd_mochi_esp32s3.ino` should be treated as the primary entry sketch.
 - `archive/clawd_mochi_esp32s3_v0.1.0.ino` is kept as the previous v0.1.0 snapshot for archival clarity.
-- The firmware does not embed the desktop app SVG assets; it uses lightweight procedural drawings inspired by the state model.
+- The firmware does not embed the desktop app SVG assets; it uses lightweight procedural full-body drawings inspired by the state model.

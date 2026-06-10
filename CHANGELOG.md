@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.2.1 - 2026-06-10
+
+- changed the firmware animation layer from face-only drawings to full-body Clawd-style procedural drawings
+- added pixel-body torso, arms, feet, ground shadow, and state props
+- added full-body typing keyboard, notification bubble, thinking bubble, sleep, yawn, happy, and error variants
+- kept the firmware asset-free: desktop SVG files are not embedded in the public firmware
+
 ## v0.2.0 - 2026-06-10
 
 - added Clawd on Desk inspired state model for the firmware animation layer

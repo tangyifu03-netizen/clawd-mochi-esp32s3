@@ -330,51 +330,60 @@ void drawClawdFrame(const char* mood, int8_t eyeOffset, int8_t lid,
   termMode = false;
   tft.fillScreen(animBgColor);
 
-  const int16_t lx = 54 + eyeOffset;
-  const int16_t rx = 148 + eyeOffset;
-  const int16_t ey = 78 + lid;
-  const int16_t eh = max(8, 62 - abs(lid) * 3);
+  const int16_t s = 8;
+  const int16_t ox = 60 + eyeOffset;
+  const int16_t oy = 36 + lid;
+  const int16_t bounce = (spark || mouth) ? -4 : 0;
+  const int16_t bx = ox;
+  const int16_t by = oy + bounce;
 
-  tft.fillRoundRect(lx, ey, 34, eh, 4, C_BLACK);
-  tft.fillRoundRect(rx, ey, 34, eh, 4, C_BLACK);
+  tft.fillRoundRect(ox + 22, oy + 128, 76, 9, 4, C_BLACK);
+  tft.drawRoundRect(ox + 22, oy + 128, 76, 9, 4, C_MUTED);
 
-  if (lid > 8) {
-    tft.fillRect(lx, ey + eh / 2, 34, 5, animBgColor);
-    tft.fillRect(rx, ey + eh / 2, 34, 5, animBgColor);
-  }
-
-  tft.fillCircle(lx + 23, ey + 16, 3, C_WHITE);
-  tft.fillCircle(rx + 23, ey + 16, 3, C_WHITE);
-
-  if (mouth) {
-    for (int deg = 30; deg <= 150; deg += 8) {
-      float a = deg * 0.0174533f;
-      tft.fillCircle(120 + cos(a) * 33, 150 + sin(a) * 18, 2, C_BLACK);
-    }
-  } else {
-    tft.fillRect(104, 158, 32, 5, C_BLACK);
-  }
+  // Pixel-body Clawd: shadow, feet, torso, arms, eyes.
+  tft.fillRect(bx + 3 * s,  by + 13 * s, s,     3 * s, C_BLACK);
+  tft.fillRect(bx + 5 * s,  by + 13 * s, s,     3 * s, C_BLACK);
+  tft.fillRect(bx + 9 * s,  by + 13 * s, s,     3 * s, C_BLACK);
+  tft.fillRect(bx + 11 * s, by + 13 * s, s,     3 * s, C_BLACK);
 
   if (spark) {
-    tft.drawFastHLine(204, 54, 18, C_WHITE);
-    tft.drawFastVLine(213, 45, 18, C_WHITE);
-    tft.fillCircle(213, 54, 3, C_WHITE);
+    tft.fillRect(bx - s,       by + 8 * s, 2 * s, 2 * s, C_BLACK);
+    tft.fillRect(bx + 14 * s,  by + 8 * s, 2 * s, 2 * s, C_BLACK);
+  } else {
+    tft.fillRect(bx,           by + 9 * s, 2 * s, 2 * s, C_BLACK);
+    tft.fillRect(bx + 13 * s,  by + 9 * s, 2 * s, 2 * s, C_BLACK);
+  }
+
+  tft.fillRoundRect(bx + 2 * s, by + 6 * s, 11 * s, 7 * s, 3, C_BLACK);
+  tft.fillRect(bx + 2 * s, by + 6 * s, 11 * s, s, C_DARKBG);
+
+  if (lid > 8) {
+    tft.fillRect(bx + 4 * s,  by + 9 * s, s, 2, C_WHITE);
+    tft.fillRect(bx + 10 * s, by + 9 * s, s, 2, C_WHITE);
+  } else if (mouth) {
+    drawChevron(bx + 4 * s + 4,  by + 9 * s, 6, 6, 2, true,  C_WHITE);
+    drawChevron(bx + 10 * s + 4, by + 9 * s, 6, 6, 2, false, C_WHITE);
+  } else {
+    tft.fillRect(bx + 4 * s,  by + 8 * s, s, 2 * s, C_WHITE);
+    tft.fillRect(bx + 10 * s, by + 8 * s, s, 2 * s, C_WHITE);
   }
 
   if (bubble) {
-    tft.drawCircle(190, 54, 9, C_WHITE);
-    tft.drawCircle(207, 42, 5, C_WHITE);
-    tft.fillCircle(218, 34, 2, C_WHITE);
+    tft.drawCircle(ox + 124, oy + 42, 9, C_WHITE);
+    tft.drawCircle(ox + 140, oy + 29, 5, C_WHITE);
+    tft.fillCircle(ox + 151, oy + 21, 2, C_WHITE);
+  }
+
+  if (spark) {
+    tft.drawFastHLine(196, 48, 18, C_WHITE);
+    tft.drawFastVLine(205, 39, 18, C_WHITE);
+    tft.fillCircle(205, 48, 3, C_WHITE);
   }
 }
 
 void drawClawdDoze(uint8_t frame) {
   clawdMood = "idle-doze";
-  termMode = false;
-  tft.fillScreen(animBgColor);
-  tft.fillRect(58, 112, 34, 6, C_BLACK);
-  tft.fillRect(150, 112, 34, 6, C_BLACK);
-  tft.fillRect(104, 156, 32, 5, C_BLACK);
+  drawClawdFrame("idle-doze", 0, 12, false, false, false);
   tft.setTextColor(C_WHITE); tft.setTextSize(2);
   tft.setCursor(184 + (frame % 2) * 6, 54); tft.print("z");
   tft.setCursor(202, 36); tft.print("Z");
@@ -382,49 +391,54 @@ void drawClawdDoze(uint8_t frame) {
 
 void drawClawdYawn(uint8_t frame) {
   clawdMood = "idle-yawn";
-  termMode = false;
-  tft.fillScreen(animBgColor);
-  tft.fillRect(58, 108, 34, 7, C_BLACK);
-  tft.fillRect(150, 108, 34, 7, C_BLACK);
-  tft.drawCircle(120, 154, 15 + frame % 2, C_BLACK);
-  tft.drawCircle(120, 154, 16 + frame % 2, C_BLACK);
+  drawClawdFrame("idle-yawn", 0, 4, false, false, false);
+  tft.fillCircle(120, 124, 10 + frame % 2, C_WHITE);
+  tft.fillCircle(180, 120, 4, C_WHITE);
 }
 
 void drawClawdThinking(uint8_t frame) {
   currentView = VIEW_CODE;
   drawClawdFrame(frame % 2 ? "working-thinking" : "working-ultrathink",
                  frame % 2 ? 2 : -2, 0, false, frame % 2, false);
-  tft.fillRect(72, 66, 42, 9, C_BLACK);
-  tft.fillRect(140, 66, 42, 9, C_BLACK);
+  tft.drawCircle(66, 54, 8, C_WHITE);
+  tft.drawCircle(52, 68, 4, C_WHITE);
+  tft.fillCircle(64, 54, 2 + frame % 2, C_WHITE);
+  tft.fillCircle(72, 54, 2, C_WHITE);
 }
 
 void drawClawdTyping(uint8_t frame) {
   currentView = VIEW_CODE;
   drawClawdFrame("working-typing", frame % 2 ? 3 : -3, 0, false, false, false);
-  const int16_t y = 184;
-  for (uint8_t i = 0; i < 3; i++) {
-    tft.fillCircle(100 + i * 20, y + ((frame + i) % 2) * 5, 4, C_BLACK);
+  tft.fillRoundRect(56, 164, 128, 26, 3, C_DARKBG);
+  tft.drawRoundRect(56, 164, 128, 26, 3, C_BLACK);
+  for (uint8_t row = 0; row < 2; row++) {
+    for (uint8_t i = 0; i < 9; i++) {
+      uint16_t col = ((frame + i + row) % 5 == 0) ? C_WHITE : C_MUTED;
+      tft.fillRect(64 + i * 12, 170 + row * 9, 7, 4, col);
+    }
   }
 }
 
 void drawClawdNotification() {
   currentView = VIEW_EYES_SQUISH;
   drawClawdFrame("notification", 0, -2, false, true, false);
-  tft.drawRoundRect(86, 176, 68, 24, 5, C_BLACK);
-  tft.fillTriangle(114, 199, 126, 199, 120, 208, C_BLACK);
+  tft.drawRoundRect(82, 42, 76, 28, 6, C_WHITE);
+  tft.fillTriangle(112, 69, 126, 69, 119, 80, C_WHITE);
+  tft.fillCircle(104, 56, 3, C_WHITE);
+  tft.fillCircle(120, 56, 3, C_WHITE);
+  tft.fillCircle(136, 56, 3, C_WHITE);
 }
 
 void drawClawdError() {
   currentView = VIEW_EYES_SQUISH;
   clawdMood = "error-dizzy";
-  termMode = false;
-  tft.fillScreen(animBgColor);
-  tft.drawLine(56, 86, 90, 120, C_BLACK);
-  tft.drawLine(90, 86, 56, 120, C_BLACK);
-  tft.drawLine(150, 86, 184, 120, C_BLACK);
-  tft.drawLine(184, 86, 150, 120, C_BLACK);
-  tft.drawCircle(120, 160, 12, C_BLACK);
-  tft.drawCircle(120, 160, 13, C_BLACK);
+  drawClawdFrame("error-dizzy", 0, 0, false, false, false);
+  tft.drawLine(92, 98, 106, 112, C_WHITE);
+  tft.drawLine(106, 98, 92, 112, C_WHITE);
+  tft.drawLine(140, 98, 154, 112, C_WHITE);
+  tft.drawLine(154, 98, 140, 112, C_WHITE);
+  tft.drawCircle(120, 134, 9, C_WHITE);
+  tft.drawCircle(120, 134, 10, C_WHITE);
 }
 
 void drawNetworkInfo() {

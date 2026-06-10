@@ -4,7 +4,7 @@
 
 - 适配 ESP32-S3 + ST7789 1.54 寸 240x240 屏幕
 - 提供待机、工作、等待、完成等表情动画
-- 参考 Clawd on Desk 的状态体系，为小屏重新绘制轻量表情
+- 参考 Clawd on Desk 的全身状态体系，为小屏重新绘制轻量角色动画
 - 支持 Claude Code 通过 USB 串口联动
 - 支持 Claude Code 通过局域网 HTTP 联动
 - 提供中文 WiFi 配网页
@@ -70,4 +70,4 @@ esp32:esp32:esp32s3:CDCOnBoot=cdc,UploadSpeed=921600,FlashSize=16M,PSRAM=opi
 - `firmware/clawd_mochi_esp32s3/clawd_mochi_esp32s3.ino`：主固件文件
 - `archive/clawd_mochi_esp32s3_v0.1.0.ino`：上一版 v0.1.0 固件快照
 
-说明：固件没有直接内置桌面应用的 SVG 素材，而是把状态逻辑重新绘制成适合 ESP32 小屏的程序化动画。
+说明：固件没有直接内置桌面应用的 SVG 素材，而是把状态逻辑重新绘制成适合 ESP32 小屏的全身程序化动画。
